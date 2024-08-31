@@ -24,10 +24,28 @@ export function getRandomBlock(): Block {
   return blockValues[Math.floor(Math.random() * blockValues.length)];
 }
 
+function rotateBlock(shape: BlockShape): BlockShape {
+  const rows = shape.length;
+  const cols = shape[0].length;
+  const rotated = Array(rows)
+    .fill(null)
+    .map(() => Array(cols).fill(false));
+
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      rotated[j][rows - 1 - i] = shape[i][j];
+    }
+  }
+  return rotated;
+}
+
 type Action = {
   type: "start" | "drop" | "save" | "move";
   newBoard?: BoardShape;
   newBlock?: Block;
+  isPressingLeft?: boolean;
+  isPressingRight?: boolean;
+  isRotating?: boolean;
 };
 
 function boardReducer(state: BoardState, action: Action): BoardState {
@@ -54,8 +72,25 @@ function boardReducer(state: BoardState, action: Action): BoardState {
         droppingBlock: action.newBlock!,
         droppingShape: SHAPES[action.newBlock!].shape,
       };
-    case "move":
+    case "move": {
+      const rotatedShape = action.isRotating
+        ? rotateBlock(newState.droppingShape)
+        : newState.droppingShape;
+      let colOffSet = action.isPressingLeft ? -1 : 0;
+      colOffSet = action.isPressingRight ? 1 : colOffSet;
+      if (
+        !hasCollision(
+          newState.board,
+          rotatedShape,
+          newState.droppingRow,
+          newState.droppingColumn + colOffSet
+        )
+      ) {
+        newState.droppingColumn += colOffSet;
+        newState.droppingShape = rotatedShape;
+      }
       break;
+    }
     default: {
       const unhandledType: never = action.type;
       throw new Error("Unhandled Action Type: " + unhandledType);

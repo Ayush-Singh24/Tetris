@@ -24,6 +24,18 @@ export function useTetris() {
       if (event.key === "s") {
         setDropSpeed(DropSpeed.Fast);
       }
+
+      if (event.key === "w") {
+        dispatchBoardState({ type: "move", isRotating: true });
+      }
+
+      if (event.key === "a") {
+        dispatchBoardState({ type: "move", isPressingLeft: true });
+      }
+
+      if (event.key === "d") {
+        dispatchBoardState({ type: "move", isPressingRight: true });
+      }
     };
     const handleKeyUp = (event: KeyboardEvent) => {
       if (event.key === "s") {
