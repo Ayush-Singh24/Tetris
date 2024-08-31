@@ -66,7 +66,10 @@ function boardReducer(state: BoardState, action: Action): BoardState {
       break;
     case "save":
       return {
-        board: action.newBoard!,
+        board: [
+          ...getEmptyBoard(BOARD_HEIGHT - action.newBoard!.length),
+          ...action.newBoard!,
+        ],
         droppingRow: 0,
         droppingColumn: 3,
         droppingBlock: action.newBlock!,
