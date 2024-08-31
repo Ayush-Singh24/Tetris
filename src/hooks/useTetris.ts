@@ -14,11 +14,34 @@ export function useTetris() {
   const [dropSpeed, setDropSpeed] = useState<DropSpeed | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [upcomingBlocks, setUpcomingBlocks] = useState<Block[]>([]);
+  const [
+    { board, droppingBlock, droppingColumn, droppingRow, droppingShape },
+    dispatchBoardState,
+  ] = useTetrisBoard();
 
   useEffect(() => {
     if (!isPlaying) {
       return;
     }
+
+    let isPressingLeft = false;
+    let isPressingRight = false;
+
+    const updateMovementInterval = () => {
+      clearInterval(moveIntervalID);
+      dispatchBoardState({
+        type: "move",
+        isPressingLeft,
+        isPressingRight,
+      });
+    };
+    const moveIntervalID = setInterval(() => {
+      dispatchBoardState({
+        type: "move",
+        isPressingLeft,
+        isPressingRight,
+      });
+    }, 30);
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.repeat) {
@@ -44,6 +67,16 @@ export function useTetris() {
       if (event.key === "s") {
         setDropSpeed(DropSpeed.Normal);
       }
+
+      if (event.key === "a") {
+        isPressingLeft = false;
+        updateMovementInterval();
+      }
+
+      if (event.key === "d") {
+        isPressingRight = false;
+        updateMovementInterval();
+      }
     };
 
     document.addEventListener("keydown", handleKeyDown);
@@ -52,14 +85,10 @@ export function useTetris() {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("keyup", handleKeyUp);
+      clearInterval(moveIntervalID);
       setDropSpeed(DropSpeed.Normal);
     };
-  }, [isPlaying]);
-
-  const [
-    { board, droppingBlock, droppingColumn, droppingRow, droppingShape },
-    dispatchBoardState,
-  ] = useTetrisBoard();
+  }, [isPlaying, dispatchBoardState]);
 
   const startGame = useCallback(() => {
     const startingBlocks = [
