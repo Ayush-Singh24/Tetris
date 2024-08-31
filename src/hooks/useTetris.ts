@@ -7,6 +7,7 @@ import {
 } from "./useTetrisBoard";
 import { useInterval } from "./useInterval";
 import { Block, BlockShape, BoardShape, EmptyCell } from "../types";
+import { SHAPES } from "../constants";
 
 enum DropSpeed {
   Normal = 800,
@@ -111,7 +112,7 @@ export function useTetris() {
     dispatchBoardState({ type: "start" });
   }, [dispatchBoardState]);
 
-  const savingPostion = useCallback(() => {
+  const savingPosition = useCallback(() => {
     if (!hasCollision(board, droppingShape, droppingRow + 1, droppingColumn)) {
       setIsSaving(false);
       setDropSpeed(DropSpeed.Normal);
@@ -135,8 +136,15 @@ export function useTetris() {
     }
 
     const newUpcomingBlock = structuredClone(upcomingBlocks);
-    const newBlock = newUpcomingBlock.pop();
+    const newBlock = newUpcomingBlock.pop() as Block;
     newUpcomingBlock.unshift(getRandomBlock());
+
+    if (hasCollision(board, SHAPES[newBlock].shape, 0, 3)) {
+      setIsPlaying(false);
+      setDropSpeed(null);
+    } else {
+      setDropSpeed(DropSpeed.Normal);
+    }
 
     setScore((prevScore) => prevScore + getPoints(numClearedRows));
     setDropSpeed(DropSpeed.Normal);
@@ -155,7 +163,7 @@ export function useTetris() {
 
   const gameSpeed = useCallback(() => {
     if (isSaving) {
-      savingPostion();
+      savingPosition();
     } else if (
       hasCollision(board, droppingShape, droppingRow + 1, droppingColumn)
     ) {
@@ -170,7 +178,7 @@ export function useTetris() {
     droppingColumn,
     droppingRow,
     droppingShape,
-    savingPostion,
+    savingPosition,
     isSaving,
   ]);
 
