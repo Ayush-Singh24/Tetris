@@ -21,6 +21,9 @@ export function useTetris() {
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.repeat) {
+        return;
+      }
       if (event.key === "s") {
         setDropSpeed(DropSpeed.Fast);
       }
