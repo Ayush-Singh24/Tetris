@@ -56,11 +56,13 @@ export function useTetris() {
       }
 
       if (event.key === "a") {
-        dispatchBoardState({ type: "move", isPressingLeft: true });
+        isPressingLeft = true;
+        updateMovementInterval();
       }
 
       if (event.key === "d") {
-        dispatchBoardState({ type: "move", isPressingRight: true });
+        isPressingRight = true;
+        updateMovementInterval();
       }
     };
     const handleKeyUp = (event: KeyboardEvent) => {
