@@ -18,3 +18,28 @@ h1 {
   aspect-ratio: 1;
   border: 1px solid black;
 }
+
+.cell.Empty {
+  background-color: rgb(200, 200, 200);
+}
+.cell.I {
+  background-color: rgb(80, 227, 230);
+}
+.cell.J {
+  background-color: rgb(36, 95, 223);
+}
+.cell.L {
+  background-color: rgb(223, 173, 36);
+}
+.cell.O {
+  background-color: rgb(222, 21, 248);
+}
+.cell.S {
+  background-color: rgb(48, 211, 56);
+}
+.cell.T {
+  background-color: rgb(132, 61, 198);
+}
+.cell.Z {
+  background-color: rgb(227, 78, 78);
+}
