@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getRandomBlock, hasCollision, useTetrisBoard } from "./useTetrisBoard";
 import { useInterval } from "./useInterval";
 import { Block, BlockShape, BoardShape } from "../types";
@@ -6,6 +6,7 @@ import { Block, BlockShape, BoardShape } from "../types";
 enum DropSpeed {
   Normal = 800,
   Sliding = 100,
+  Fast = 50,
 }
 
 export function useTetris() {
@@ -13,6 +14,32 @@ export function useTetris() {
   const [dropSpeed, setDropSpeed] = useState<DropSpeed | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [upcomingBlocks, setUpcomingBlocks] = useState<Block[]>([]);
+
+  useEffect(() => {
+    if (!isPlaying) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "s") {
+        setDropSpeed(DropSpeed.Fast);
+      }
+    };
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if (event.key === "s") {
+        setDropSpeed(DropSpeed.Normal);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keyup", handleKeyUp);
+      setDropSpeed(DropSpeed.Normal);
+    };
+  }, [isPlaying]);
 
   const [
     { board, droppingBlock, droppingColumn, droppingRow, droppingShape },
