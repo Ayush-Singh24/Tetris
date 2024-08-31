@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
-import { getRandomBlock, hasCollision, useTetrisBoard } from "./useTetrisBoard";
+import {
+  BOARD_HEIGHT,
+  getRandomBlock,
+  hasCollision,
+  useTetrisBoard,
+} from "./useTetrisBoard";
 import { useInterval } from "./useInterval";
-import { Block, BlockShape, BoardShape } from "../types";
+import { Block, BlockShape, BoardShape, EmptyCell } from "../types";
 
 enum DropSpeed {
   Normal = 800,
@@ -14,6 +19,7 @@ export function useTetris() {
   const [dropSpeed, setDropSpeed] = useState<DropSpeed | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [upcomingBlocks, setUpcomingBlocks] = useState<Block[]>([]);
+  const [score, setScore] = useState(0);
   const [
     { board, droppingBlock, droppingColumn, droppingRow, droppingShape },
     dispatchBoardState,
@@ -41,7 +47,7 @@ export function useTetris() {
         isPressingLeft,
         isPressingRight,
       });
-    }, 30);
+    }, 300);
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.repeat) {
@@ -99,6 +105,7 @@ export function useTetris() {
       getRandomBlock(),
     ];
     setUpcomingBlocks(startingBlocks);
+    setScore(0);
     setIsPlaying(true);
     setDropSpeed(DropSpeed.Normal);
     dispatchBoardState({ type: "start" });
@@ -119,10 +126,19 @@ export function useTetris() {
       droppingColumn
     );
 
+    let numClearedRows = 0;
+    for (let i = BOARD_HEIGHT - 1; i >= 0; i--) {
+      if (newBoard[i].every((entry) => entry !== EmptyCell.Empty)) {
+        numClearedRows++;
+        newBoard.splice(i, 1);
+      }
+    }
+
     const newUpcomingBlock = structuredClone(upcomingBlocks);
     const newBlock = newUpcomingBlock.pop();
     newUpcomingBlock.unshift(getRandomBlock());
 
+    setScore((prevScore) => prevScore + getPoints(numClearedRows));
     setDropSpeed(DropSpeed.Normal);
     setUpcomingBlocks(newUpcomingBlock);
     dispatchBoardState({ type: "save", newBoard, newBlock });
@@ -180,7 +196,25 @@ export function useTetris() {
     board: renderedBoard,
     startGame,
     isPlaying,
+    score,
   };
+}
+
+function getPoints(numClearedRows: number): number {
+  switch (numClearedRows) {
+    case 0:
+      return 0;
+    case 1:
+      return 100;
+    case 2:
+      return 300;
+    case 3:
+      return 500;
+    case 4:
+      return 800;
+    default:
+      throw new Error("Unexpected number of rows cleared!");
+  }
 }
 
 function addShapeToBoard(
