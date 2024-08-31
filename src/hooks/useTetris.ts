@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { hasCollision, useTetrisBoard } from "./useTetrisBoard";
+import { getRandomBlock, hasCollision, useTetrisBoard } from "./useTetrisBoard";
 import { useInterval } from "./useInterval";
 import { Block, BlockShape, BoardShape } from "../types";
 
@@ -12,6 +12,7 @@ export function useTetris() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [dropSpeed, setDropSpeed] = useState<DropSpeed | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [upcomingBlocks, setUpcomingBlocks] = useState<Block[]>([]);
 
   const [
     { board, droppingBlock, droppingColumn, droppingRow, droppingShape },
@@ -19,6 +20,12 @@ export function useTetris() {
   ] = useTetrisBoard();
 
   const startGame = useCallback(() => {
+    const startingBlocks = [
+      getRandomBlock(),
+      getRandomBlock(),
+      getRandomBlock(),
+    ];
+    setUpcomingBlocks(startingBlocks);
     setIsPlaying(true);
     setDropSpeed(DropSpeed.Normal);
     dispatchBoardState({ type: "start" });
@@ -30,7 +37,7 @@ export function useTetris() {
       setDropSpeed(DropSpeed.Normal);
       return;
     }
-    const newBoard = structuredClone(board) as BoardShape;
+    const newBoard = structuredClone(board);
     addShapeToBoard(
       newBoard,
       droppingBlock,
@@ -39,8 +46,13 @@ export function useTetris() {
       droppingColumn
     );
 
+    const newUpcomingBlock = structuredClone(upcomingBlocks);
+    const newBlock = newUpcomingBlock.pop();
+    newUpcomingBlock.unshift(getRandomBlock());
+
     setDropSpeed(DropSpeed.Normal);
-    dispatchBoardState({ type: "save", newBoard });
+    setUpcomingBlocks(newUpcomingBlock);
+    dispatchBoardState({ type: "save", newBoard, newBlock });
     setIsSaving(false);
   }, [
     board,
@@ -49,6 +61,7 @@ export function useTetris() {
     droppingColumn,
     dispatchBoardState,
     droppingBlock,
+    upcomingBlocks,
   ]);
 
   const gameSpeed = useCallback(() => {
@@ -79,7 +92,7 @@ export function useTetris() {
     gameSpeed();
   }, dropSpeed);
 
-  const renderedBoard = structuredClone(board) as BoardShape;
+  const renderedBoard = structuredClone(board);
   if (isPlaying) {
     addShapeToBoard(
       renderedBoard,
