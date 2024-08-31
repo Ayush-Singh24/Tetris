@@ -26,6 +26,7 @@ export function getRandomBlock(): Block {
 
 type Action = {
   type: "start" | "drop" | "save" | "move";
+  newBoard?: BoardShape;
 };
 
 function boardReducer(state: BoardState, action: Action): BoardState {
@@ -45,6 +46,13 @@ function boardReducer(state: BoardState, action: Action): BoardState {
       newState.droppingRow++;
       break;
     case "save":
+      return {
+        board: action.newBoard!,
+        droppingRow: 0,
+        droppingColumn: 3,
+        droppingBlock: state.droppingBlock,
+        droppingShape: state.droppingShape,
+      };
       break;
     case "move":
       break;
@@ -54,6 +62,31 @@ function boardReducer(state: BoardState, action: Action): BoardState {
     }
   }
   return newState;
+}
+
+export function hasCollision(
+  board: BoardShape,
+  currentShape: BlockShape,
+  row: number,
+  col: number
+): boolean {
+  let hasCollision = false;
+  currentShape
+    .filter((shapeRow) => shapeRow.some((isSet) => isSet))
+    .forEach((shapeRow: boolean[], rowIndex: number) => {
+      shapeRow.forEach((isSet: boolean, colIndex: number) => {
+        if (
+          isSet &&
+          (row + rowIndex >= board.length ||
+            col + colIndex >= board[0].length ||
+            col + colIndex < 0 ||
+            board[row + rowIndex][col + colIndex] !== EmptyCell.Empty)
+        ) {
+          hasCollision = true;
+        }
+      });
+    });
+  return hasCollision;
 }
 
 export function useTetrisBoard(): [BoardState, Dispatch<Action>] {
