@@ -205,6 +205,7 @@ export function useTetris() {
     startGame,
     isPlaying,
     score,
+    upcomingBlocks,
   };
 }
 

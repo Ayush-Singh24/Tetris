@@ -2,11 +2,28 @@ h1 {
   text-align: center;
 }
 
+.app {
+  display: flex;
+  gap: 10rem;
+}
+
+.upcoming {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 10px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
 .board {
   border: 2px solid black;
   user-select: none;
   margin: auto;
   width: fit-content;
+}
+
+.controls {
+  flex-grow: 1;
 }
 
 .row {
@@ -17,6 +34,10 @@ h1 {
   width: 30px;
   aspect-ratio: 1;
   border: 1px solid black;
+}
+
+.cell.hidden {
+  visibility: hidden;
 }
 
 .cell.Empty {
