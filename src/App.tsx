@@ -16,7 +16,9 @@ function App() {
         {isPlaying ? (
           <UpcomingBlock upcomingBlock={upcomingBlocks} />
         ) : (
-          <button onClick={startGame}>New Game</button>
+          <button onClick={startGame} className="button-53">
+            New Game
+          </button>
         )}
       </div>
     </div>
