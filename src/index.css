@@ -118,3 +118,15 @@ h1 {
     font-size: 1.25rem;
   }
 }
+
+.playing-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5rem;
+}
+
+.ingame-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}

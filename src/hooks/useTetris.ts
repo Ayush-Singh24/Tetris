@@ -17,6 +17,7 @@ enum DropSpeed {
 
 export function useTetris() {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [dropSpeed, setDropSpeed] = useState<DropSpeed | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [upcomingBlocks, setUpcomingBlocks] = useState<Block[]>([]);
@@ -108,6 +109,7 @@ export function useTetris() {
     setUpcomingBlocks(startingBlocks);
     setScore(0);
     setIsPlaying(true);
+    setIsPaused(false);
     setDropSpeed(DropSpeed.Normal);
     dispatchBoardState({ type: "start" });
   }, [dispatchBoardState]);
@@ -161,6 +163,16 @@ export function useTetris() {
     upcomingBlocks,
   ]);
 
+  const pauseGame = useCallback(() => {
+    if (!isPaused) {
+      setIsPaused(true);
+      setDropSpeed(null);
+    } else {
+      setIsPaused(false);
+      setDropSpeed(DropSpeed.Normal);
+    }
+  }, [isPaused]);
+
   const gameSpeed = useCallback(() => {
     if (isSaving) {
       savingPosition();
@@ -204,6 +216,8 @@ export function useTetris() {
     board: renderedBoard,
     startGame,
     isPlaying,
+    isPaused,
+    pauseGame,
     score,
     upcomingBlocks,
   };
