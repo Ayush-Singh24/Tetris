@@ -28,7 +28,8 @@ export function useTetris() {
   ] = useTetrisBoard();
 
   useEffect(() => {
-    if (!isPlaying) {
+    if (!isPlaying || isPaused) {
+      setDropSpeed(null);
       return;
     }
 
@@ -98,7 +99,7 @@ export function useTetris() {
       clearInterval(moveIntervalID);
       setDropSpeed(DropSpeed.Normal);
     };
-  }, [isPlaying, dispatchBoardState]);
+  }, [isPlaying, dispatchBoardState, isPaused]);
 
   const startGame = useCallback(() => {
     const startingBlocks = [
